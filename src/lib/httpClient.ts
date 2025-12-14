@@ -1,4 +1,5 @@
 import axios from "axios";
+import { queryClient } from "./queryClient";
 
 export const httpClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -6,17 +7,18 @@ export const httpClient = axios.create({
   withCredentials: true, // if using cookies / auth
 });
 
-// axios.interceptors.response.use(
-//   (res) => res,
-//   async (error) => {
-//     if (error.response?.status === 401) {
-//       // later: refresh token logic here
-
-//       queryClient.removeQueries({ queryKey: ["auth"] });
-//       window.location.href = "/login";
-//     }
-//     return Promise.reject(error);
-//   }
-// );
-// queryClient.setQueryData(['auth', 'me'], user)
-// queryClient.removeQueries({ queryKey: ['auth'] })
+httpClient.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    if (error.response?.status === 401) {
+      console.log("401 in interceptor");
+      queryClient.setQueryData(["auth", "me"], null);
+      // queryClient.invalidateQueries({ queryKey: ["auth"] });
+    }
+    return Promise.reject({
+      type: "http",
+      status: error.response?.status,
+      message: error.response?.data?.message ?? "Request failed",
+    });
+  }
+);

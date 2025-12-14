@@ -1,6 +1,6 @@
 import type { User } from "./user";
 
-export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+export type AuthStatus = "authenticated" | "unauthenticated";
 
 export type AuthState = {
   status: AuthStatus;

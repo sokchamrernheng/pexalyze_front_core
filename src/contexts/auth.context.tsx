@@ -5,13 +5,13 @@ import type { AuthState } from "@/types/auth.state";
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { data, isLoading } = useWhoAmI();
-  const state: AuthState = isLoading
-    ? { status: "loading", user: null }
-    : data
-      ? { status: "authenticated", user: data }
-      : { status: "unauthenticated", user: null };
-
+  const { data } = useWhoAmI();
+  console.log(data);
+  const state: AuthState =
+    data == null
+      ? { status: "unauthenticated", user: null }
+      : { status: "authenticated", user: data };
+  console.log(state);
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 }
 

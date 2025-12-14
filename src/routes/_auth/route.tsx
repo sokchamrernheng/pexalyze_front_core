@@ -1,17 +1,17 @@
-import { queryClient } from "@/lib/queryClient";
+import { authService } from "@/services/auth.service";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_auth")({
-  beforeLoad: ({ context, location }) => {
-    console.log(context);
-    const is = context.queryClient === queryClient;
-    console.log(is);
-    // if (!context) {
-    //   throw redirect({
-    //     to: "/login",
-    //     search: { from: location.href },
-    //   });
-    // }
+  beforeLoad: async ({ context, location }) => {
+    if (context.auth.status !== "unauthenticated") {
+      console.log("true");
+      throw redirect({
+        to: "/home",
+        search: { from: location.href },
+        replace: true,
+      });
+    }
+    console.log("false", context.auth.status);
   },
   component: () => <Outlet />,
 });

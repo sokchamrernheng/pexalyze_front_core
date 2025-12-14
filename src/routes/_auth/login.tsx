@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,33 +10,40 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useEffect } from "react";
-import { httpClient } from "@/lib/httpClient";
+import { useForm } from "@tanstack/react-form";
+import { loginSchema } from "@/schemas/auth.schema";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { useAuth } from "@/contexts/auth.context";
+import { useLogin } from "@/queries/auth.queries";
 
 export const Route = createFileRoute("/_auth/login")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  useEffect(() => {
-    if (import.meta.env.MODE !== "development") return;
+  const login = useLogin();
+  // const auth = useAuth();
+  // const navigate = useNavigate();
 
-    async function login() {
-      try {
-        await httpClient.post("/auth/login", {
-          email: "sokchamrernheng@gmail.com",
-          password: "Admin@123",
-        });
+  // If already logged in, leave immediately
+  // if (auth.status === "authenticated") {
+  //   navigate({ to: "/home", replace: true });
+  //   return null;
+  // }
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
 
-        console.log("Dev auto-login success");
-      } catch (err) {
-        console.error("Dev auto-login failed", err);
-      }
-    }
+    validators: {
+      onSubmit: loginSchema,
+    },
 
-    login();
-  }, []);
+    onSubmit: async ({ value }) => {
+      login.mutate(value);
+    },
+  });
 
   return (
     <div className="h-screen flex items-center justify-center">
@@ -51,34 +58,89 @@ function RouteComponent() {
           </CardAction>
         </CardHeader>
         <CardContent>
-          <form>
+          {/* Mutation error */}
+          {login.isError && (
+            <p className="text-sm text-red-500">Invalid email or password</p>
+          )}
+          <form
+            id="login-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
+            }}
+          >
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
+              <form.Field
+                name="email"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid} className="grid gap-2">
+                      <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        autoComplete="off"
+                        placeholder="m@example.com"
+                        required
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+              <form.Field
+                name="password"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid} className="grid gap-2">
+                      <div className="flex items-center">
+                        <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                        <a
+                          href="#"
+                          className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                        >
+                          Forgot your password?
+                        </a>
+                      </div>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        autoComplete="off"
+                        required
+                        type="password"
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            disabled={!form.state.canSubmit || login.isPending}
+            className="w-full"
+            form="login-form"
+          >
             Login
           </Button>
         </CardFooter>

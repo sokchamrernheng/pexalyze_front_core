@@ -5,7 +5,7 @@ export const authService = {
   whoAmI: async (): Promise<User | null> => {
     try {
       const res = await httpClient.get("/auth/whoAmI");
-      return res.data;
+      return res.data.data;
     } catch (err: any) {
       if (err.response?.status === 401) {
         return null;

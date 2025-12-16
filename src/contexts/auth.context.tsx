@@ -5,12 +5,18 @@ import type { AuthState } from "@/types/auth.state";
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { data } = useWhoAmI();
-  console.log(data);
-  const state: AuthState =
-    data == null
-      ? { status: "unauthenticated", user: null }
-      : { status: "authenticated", user: data };
+  const { data, isLoading, isError } = useWhoAmI()
+
+  let state: AuthState
+
+  if (isLoading) {
+    state = { status: 'loading', user: null }
+  } else if (isError || data == null) {
+    state = { status: 'unauthenticated', user: null }
+  } else {
+    state = { status: 'authenticated', user: data }
+  }
+
   console.log(state);
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 }

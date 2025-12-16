@@ -17,8 +17,11 @@ import { Route as DemoTableRouteImport } from './routes/demo/table'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AppHomeRouteImport } from './routes/_app/home'
+import { Route as AppDashboardRouteRouteImport } from './routes/_app/_dashboard/route'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
+import { Route as AppDashboardWorkflowRouteImport } from './routes/_app/_dashboard/workflow'
+import { Route as AppDashboardOverviewRouteImport } from './routes/_app/_dashboard/overview'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
@@ -58,6 +61,10 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppDashboardRouteRoute = AppDashboardRouteRouteImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
   id: '/demo/form/simple',
   path: '/demo/form/simple',
@@ -68,6 +75,16 @@ const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
   path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppDashboardWorkflowRoute = AppDashboardWorkflowRouteImport.update({
+  id: '/workflow',
+  path: '/workflow',
+  getParentRoute: () => AppDashboardRouteRoute,
+} as any)
+const AppDashboardOverviewRoute = AppDashboardOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => AppDashboardRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -76,6 +93,8 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/overview': typeof AppDashboardOverviewRoute
+  '/workflow': typeof AppDashboardWorkflowRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
 }
@@ -86,6 +105,8 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/overview': typeof AppDashboardOverviewRoute
+  '/workflow': typeof AppDashboardWorkflowRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
 }
@@ -94,11 +115,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
+  '/_app/_dashboard': typeof AppDashboardRouteRouteWithChildren
   '/_app/home': typeof AppHomeRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/_app/_dashboard/overview': typeof AppDashboardOverviewRoute
+  '/_app/_dashboard/workflow': typeof AppDashboardWorkflowRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
 }
@@ -111,6 +135,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/overview'
+    | '/workflow'
     | '/demo/form/address'
     | '/demo/form/simple'
   fileRoutesByTo: FileRoutesByTo
@@ -121,6 +147,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/overview'
+    | '/workflow'
     | '/demo/form/address'
     | '/demo/form/simple'
   id:
@@ -128,11 +156,14 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/_auth'
+    | '/_app/_dashboard'
     | '/_app/home'
     | '/_auth/login'
     | '/_auth/register'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/_app/_dashboard/overview'
+    | '/_app/_dashboard/workflow'
     | '/demo/form/address'
     | '/demo/form/simple'
   fileRoutesById: FileRoutesById
@@ -205,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/_dashboard': {
+      id: '/_app/_dashboard'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppDashboardRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/demo/form/simple': {
       id: '/demo/form/simple'
       path: '/demo/form/simple'
@@ -219,14 +257,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoFormAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/_dashboard/workflow': {
+      id: '/_app/_dashboard/workflow'
+      path: '/workflow'
+      fullPath: '/workflow'
+      preLoaderRoute: typeof AppDashboardWorkflowRouteImport
+      parentRoute: typeof AppDashboardRouteRoute
+    }
+    '/_app/_dashboard/overview': {
+      id: '/_app/_dashboard/overview'
+      path: '/overview'
+      fullPath: '/overview'
+      preLoaderRoute: typeof AppDashboardOverviewRouteImport
+      parentRoute: typeof AppDashboardRouteRoute
+    }
   }
 }
 
+interface AppDashboardRouteRouteChildren {
+  AppDashboardOverviewRoute: typeof AppDashboardOverviewRoute
+  AppDashboardWorkflowRoute: typeof AppDashboardWorkflowRoute
+}
+
+const AppDashboardRouteRouteChildren: AppDashboardRouteRouteChildren = {
+  AppDashboardOverviewRoute: AppDashboardOverviewRoute,
+  AppDashboardWorkflowRoute: AppDashboardWorkflowRoute,
+}
+
+const AppDashboardRouteRouteWithChildren =
+  AppDashboardRouteRoute._addFileChildren(AppDashboardRouteRouteChildren)
+
 interface AppRouteRouteChildren {
+  AppDashboardRouteRoute: typeof AppDashboardRouteRouteWithChildren
   AppHomeRoute: typeof AppHomeRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppDashboardRouteRoute: AppDashboardRouteRouteWithChildren,
   AppHomeRoute: AppHomeRoute,
 }
 

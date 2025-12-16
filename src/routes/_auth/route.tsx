@@ -1,17 +1,19 @@
-import { authService } from "@/services/auth.service";
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Spinner } from "@/components/ui/spinner";
+import { useAuth } from "@/contexts/auth.context";
+import { createFileRoute, Navigate, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_auth")({
-  beforeLoad: async ({ context, location }) => {
-    if (context.auth.status !== "unauthenticated") {
-      console.log("true");
-      throw redirect({
-        to: "/home",
-        search: { from: location.href },
-        replace: true,
-      });
-    }
-    console.log("false", context.auth.status);
-  },
-  component: () => <Outlet />,
+  component: RouteComponent,
 });
+
+
+function RouteComponent () {
+  const auth = useAuth();
+  if (auth.status === 'loading') {
+    return <Spinner/>;
+  }
+  if (auth.status === 'authenticated') {
+    return <Navigate to="/home" replace />
+  }
+  return <Outlet/>;
+}

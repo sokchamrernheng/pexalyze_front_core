@@ -34,9 +34,7 @@ declare module "@tanstack/react-router" {
 }
 
 function App() {
-  console.log("its starting from here");
   const auth = useAuth();
-  console.log("useAuth() is getting called");
   return <RouterProvider router={router} context={{ queryClient, auth }} />;
 }
 
@@ -45,13 +43,13 @@ const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    //<StrictMode>
+    <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <App />
       </AuthProvider>
     </QueryClientProvider>
-    //</StrictMode>
+    </StrictMode>
   );
 }
 

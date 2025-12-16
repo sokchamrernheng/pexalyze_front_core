@@ -18,13 +18,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import {
-  AxeIcon,
+  createFileRoute,
+  Outlet,
+  Link,
+  useRouterState,
+} from "@tanstack/react-router";
+import {
+  ChartGantt,
   ChevronDown,
   ChevronUp,
+  Plug,
   Settings2Icon,
   User2,
+  Workflow,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth.context";
 import { TenantService } from "@/services/tenant.service";
@@ -37,6 +44,9 @@ export const Route = createFileRoute("/_app/_dashboard")({
 function RouteComponent() {
   const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
 
   useEffect(() => {
     const loadTenants = async () => {
@@ -84,11 +94,36 @@ function RouteComponent() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <a>
-                      <AxeIcon />
-                      <span>KAB HENG JMR LOV HZ</span>
-                    </a>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/overview"}
+                  >
+                    <Link to="/overview">
+                      <ChartGantt />
+                      <span>Overview</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/workflows"}
+                  >
+                    <Link to="/workflows">
+                      <Workflow />
+                      <span>Workflows</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/connectors"}
+                  >
+                    <Link to="/connectors">
+                      <Plug />
+                      <span>Connectors</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
